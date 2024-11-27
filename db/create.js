@@ -9,22 +9,24 @@ const db = new sqlite3.Database('productos.db', (err) => {
 
 const createTableCategoriaSQL = `
   CREATE TABLE IF NOT EXISTS categoria (
-    idCategoria INTEGER PRIMARY KEY AUTOINCREMENT,
-    nombre TEXT NOT NULL UNIQUE
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  nombre TEXT NOT NULL
   );
 `;
 
 const createTableProductosSQL = `
   CREATE TABLE IF NOT EXISTS productos (
-    idProducto INTEGER PRIMARY KEY AUTOINCREMENT,
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
     nombre TEXT NOT NULL,
     descripcion TEXT NOT NULL,
     precio REAL NOT NULL,
     stock INTEGER NOT NULL,
+    stockMinimo INTEGER NOT NULL,
     categoria TEXT,
     FOREIGN KEY (categoria) REFERENCES categoria(nombre) ON DELETE SET NULL
   );
 `;
+
 
 
 db.run(createTableProductosSQL, (err) => {

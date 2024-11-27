@@ -59,10 +59,10 @@ app.get("/api/productos", (req, res) => {
 
 
 app.post('/api/productos', (req, res) => {
-  const { nombre, descripcion, categoria, precio, stock } = req.body;
+  const { nombre, descripcion, categoria, precio, stock, stockMinimo } = req.body;
 
-  const sql = 'INSERT INTO productos (nombre, descripcion, categoria, precio, stock) VALUES (?, ?, ?, ?, ?)';
-  const params = [nombre, descripcion, categoria, precio, stock];
+  const sql = 'INSERT INTO productos (nombre, descripcion, categoria, precio, stock, stockMinimo) VALUES (?, ?, ?, ?, ?, ?)';
+  const params = [nombre, descripcion, categoria, precio, stock, stockMinimo];
 
   db.run(sql, params, function(err) {
     if (err) {
@@ -75,9 +75,11 @@ app.post('/api/productos', (req, res) => {
       categoria,
       precio,
       stock,
+      stockMinimo,
     });
   });
 });
+
 
 app.delete('/api/productos/:idProducto', (req, res) => {
   const idProducto = req.params.idProducto;

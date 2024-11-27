@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import ProductManagement from './Productos/ProductManagement'; // Asegúrate de que este es el nombre correcto del componente
+import MainProductos from './MainProductos';// Asegúrate de que este es el nombre correcto del componente
 
 const Inventario = () => <div>Contenido de Inventario</div>;
 const Ventas = () => <div>Contenido de Ventas</div>;
@@ -13,7 +13,7 @@ const Header = () => {
   const renderContent = () => {
     switch (activeTab) {
       case 'Productos':
-        return <ProductManagement />; // Renderiza el componente ProductManagement
+        return <MainProductos />; // Renderiza el componente ProductManagement
       case 'Inventario':
         return <Inventario />;
       case 'Ventas':
