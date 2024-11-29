@@ -1,8 +1,7 @@
-'use client'
-
 import { useState } from 'react';
 import ConfirmationModal from './ConfirmationModal';
 import { createCategory } from '../controllers/categoryController';
+import Alert from '../components/Alert'; // Importa el componente de alerta
 
 export default function CategoryForm() {
   const [nombre, setNombre] = useState('');
@@ -43,10 +42,13 @@ export default function CategoryForm() {
   };
 
   return (
-    <div className="w-full max-w-md mx-auto bg-white shadow-lg p-6 rounded-lg">
+    <div className="w-full max-w-4xl mx-auto bg-white shadow-lg p-6 rounded-lg">
       <div className="text-center mb-6">
         <h2 className="text-2xl font-semibold">Agregar Nueva Categoría</h2>
       </div>
+
+      {status.message && <Alert message={status.message} type={status.type} onClose={() => setStatus({ message: '', type: '' })} />}
+
       <form onSubmit={handleSubmit} className="space-y-4">
         <div className="space-y-2">
           <label htmlFor="nombre" className="text-sm font-medium">
@@ -62,14 +64,6 @@ export default function CategoryForm() {
             className="w-full px-4 py-2 border border-gray-300 rounded-md"
           />
         </div>
-
-        {status.message && (
-          <div
-            className={`p-4 mt-4 rounded-md ${status.type === 'error' ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700'}`}
-          >
-            {status.message}
-          </div>
-        )}
 
         <button
           type="submit"

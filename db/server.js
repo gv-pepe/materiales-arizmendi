@@ -17,23 +17,38 @@ const db = new sqlite3.Database("productos.db", (err) => {
 
 app.post('/api/categorias', (req, res) => {
   const { nombre } = req.body;
+
+  // Verificar si el nombre es obligatorio
   if (!nombre) {
     return res.status(400).json({ error: 'El nombre de la categoría es obligatorio' });
   }
 
-  const sql = 'INSERT INTO categoria (nombre) VALUES (?)';
-  const params = [nombre];
-  
-  db.run(sql, params, function(err) {
+  // Verificar si la categoría ya existe en la base de datos
+  const checkCategorySql = 'SELECT COUNT(*) AS count FROM categoria WHERE nombre = ?';
+  db.get(checkCategorySql, [nombre], (err, row) => {
     if (err) {
-      return res.status(400).json({ error: err.message });
+      return res.status(500).json({ error: 'Error al verificar la categoría' });
     }
-    res.json({
-      idCategoria: this.lastID, // Devuelve el ID de la nueva categoría
-      nombre,
+
+    // Si la categoría ya existe, devolver un error
+    if (row.count > 0) {
+      return res.status(400).json({ error: 'La categoría ya existe' });
+    }
+
+    // Si no existe, insertar la nueva categoría
+    const sql = 'INSERT INTO categoria (nombre) VALUES (?)';
+    db.run(sql, [nombre], function(err) {
+      if (err) {
+        return res.status(400).json({ error: err.message });
+      }
+      res.json({
+        idCategoria: this.lastID, // Devuelve el ID de la nueva categoría
+        nombre,
+      });
     });
   });
 });
+
 
 
 app.get('/api/categorias', (req, res) => {
@@ -81,15 +96,15 @@ app.post('/api/productos', (req, res) => {
 });
 
 
-app.delete('/api/productos/:idProducto', (req, res) => {
-  const idProducto = req.params.idProducto;
+app.delete('/api/productos/:id', (req, res) => {
+  const id = req.params.id;
 
-  if (!idProducto) {
+  if (!id) {
     return res.status(400).json({ message: "ID del producto no proporcionado." });
   }
 
-  const sql = 'DELETE FROM productos WHERE idProducto = ?';
-  db.run(sql, [idProducto], function (error) {
+  const sql = 'DELETE FROM productos WHERE id = ?';
+  db.run(sql, [id], function (error) {
     if (error) {
       return res.status(500).json({ message: "Error al eliminar el producto", error: error.message });
     }
@@ -102,9 +117,8 @@ app.delete('/api/productos/:idProducto', (req, res) => {
   });
 });
 
-// Modificación en la ruta PUT para actualizar productos
-app.put("/api/productos/:idProducto", (req, res) => {
-  const { idProducto } = req.params; // Asegúrate de que este es el ID correcto
+app.put("/api/productos/:id", (req, res) => {
+  const { id } = req.params; 
   const { nombre, descripcion, categoria, precio, stock } = req.body;
 
   const sql = `UPDATE productos SET 
@@ -113,9 +127,9 @@ app.put("/api/productos/:idProducto", (req, res) => {
                 categoria = ?, 
                 precio = ?, 
                 stock = ? 
-              WHERE idProducto = ?`;
+              WHERE id = ?`;
   
-  const params = [nombre, descripcion, categoria, precio, stock, idProducto];
+  const params = [nombre, descripcion, categoria, precio, stock, id];
 
   db.run(sql, params, function(err) {
     if (err) {
@@ -127,7 +141,7 @@ app.put("/api/productos/:idProducto", (req, res) => {
     }
 
     // Opcional: Puedes obtener el producto actualizado para devolverlo en la respuesta
-    db.get(`SELECT * FROM productos WHERE idProducto = ?`, [idProducto], (err, row) => {
+    db.get(`SELECT * FROM productos WHERE id = ?`, [id], (err, row) => {
       if (err) {
         return res.status(500).json({ message: "Error al obtener el producto actualizado", error: err.message });
       }
